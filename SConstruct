@@ -27,7 +27,7 @@ def Install( target, source, env ):
 			os.makedirs(d)
 		
 		# todo: use shutil or something, not system!
-		cmd = "cp -r %s/build/optimised/bin/* %s"%(m, d)
+		cmd = "rsync -r %s/build/optimised/bin/* %s --exclude '*.o'"%(m, d)
 		os.system(cmd)
 
 installCommand = Command('install', [], Install )
