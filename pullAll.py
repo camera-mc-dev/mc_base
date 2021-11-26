@@ -10,6 +10,11 @@ print(modules)
 
 for m in modules:
 	os.chdir(m)
+	print( "\033[96m" ) # cyan
+	print( "----------------------------" )
+	print( "            %s"%m )
+	print( "----------------------------" )
+	print( "\033[0m" )  # normal
 	os.system('git pull')
 	os.chdir("..")
 
