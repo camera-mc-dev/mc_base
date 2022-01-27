@@ -16,7 +16,8 @@ for m in modules:
 # Edit this to say where you want to install to
 #
 def Install( target, source, env ):
-	installRoot = "/opt/mc_bin/"
+	installRoot = ARGUMENTS.get('installDir','/opt/mc_bin/')
+	# installRoot = "/opt/mc_bin/"
 	for m in modules:
 		d = "%s/%s"%(installRoot,m)
 		print(d)
@@ -30,8 +31,11 @@ def Install( target, source, env ):
 		cmd = "rsync -r %s/build/optimised/bin/* %s --exclude '*.o'"%(m, d)
 		os.system(cmd)
 
-installCommand = Command('install', [], Install )
-Depends( installCommand, BUILD_TARGETS )
-if 'install' not in BUILD_TARGETS:
-	BUILD_TARGETS.append('install')
+doInstall = ARGUMENTS.get('install','false')
+
+if doInstall == 'true':
+	installCommand = Command('install', [], Install )
+	Depends( installCommand, BUILD_TARGETS )
+	if 'install' not in BUILD_TARGETS:
+		BUILD_TARGETS.append('install')
 
