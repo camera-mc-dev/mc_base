@@ -1,6 +1,6 @@
-# multi-camera, motion-capture, markerless capture c++ framework `mc_dev`
+## `mc_dev`
 
-The `mc_dev` framework is a suite of C++ tools created for enabling development of multi-camera markerless motion capture tools, but is likely to be useful to all CAMERA researchers using C++ and multiple cameras.
+The `mc_dev` framework is a suite of C++ tools created for enabling development of multi-camera markerless motion capture tools, but is likely to be useful to all CAMERA researchers using C++ and multiple cameras. Depending how you feel, you can think of the `mc_` as standing for multi-camera, motion capture or markerless capture.
 
 A brief summary of some of the key features are:
 
@@ -16,9 +16,9 @@ The full framework has been split into a number of repositories so that parts ca
   - `mc_base`: a top level directory in which to put the other parts of the project
   - `mc_core`: core framework library and tools, including calibration, image io and renderer.
   - `mc_bgs`: tools and libs for background subtraction. Includes a clone of 3rd party IMBS bgs algorithm.
-  - `mc_sds`: implementation of //Stochastic Diffusion Search// - well, more or less. A kind of evolutionary algorithm for non-linear minimisation. Not the fastest solver in the world, but easy to use and quite robust.
+  - `mc_sds`: implementation of *Stochastic Diffusion Search* - well, more or less. A kind of evolutionary algorithm for non-linear minimisation. Not the fastest solver in the world, but easy to use and quite robust.
   - `mc_imgproc`: image processing tools like debayering and ASEF/MSER filters
-  - `mc_grabber`: Tools as deployed on //Boromir// for grabbing images/video from the JAI cameras using the SISO grabbers.
+  - `mc_grabber`: Tools as deployed on *Boromir* for grabbing images/video from the JAI cameras using the SISO grabbers.
   - `mc_reconstruction`: Occupancy maps, and sparse-pose-fusion (e.g. take 2D pose detections from OpenPose or AlphaPose and do cross-camera association and 3D reconstruction)
   - `mc_fitting`: Implementations of models like SMPL, STAR, DynaDog and solvers to fit the models to point clouds, motion capture markers, sparse pose, and dense pose
   - `mc_footContact`: Tools for the foot contact project for sprinting and skeleton.
@@ -55,7 +55,9 @@ You can issue a `git status` on all the `mc_` family repos that you current have
    python3 statusAll.py
 ```
 
-## Building
+More complete build instructions are discussed in each repository, but overall, the `scons` tool is used for building all repositories, and each repository has a `mcdev_<name>_config.py` for setting build options and library paths. `scons` is mostly just Python so it should be simple enough to get a grip of.
+
+### Building
 
 If you build from the base directory then dependencies between repositories will be automatically resolved - e.g. the build process will ensure `mc_core` is up to date before building `mc_reconstruction`
 
@@ -79,7 +81,7 @@ or
    scons mc_bgs/build/debug -j6
 ```
 
-## Install
+### Install
 
 There is also an install command which will install all repository programmes under `/opt/mc_bin/` so you can have `/opt/mc_bin/mc_core/x` for all the `mc_core` tools.
 
