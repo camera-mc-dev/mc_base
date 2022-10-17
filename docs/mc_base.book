@@ -1,0 +1,38 @@
+#!/usr/bin/env python2
+
+import meBook
+import os
+
+# "meBook" is a python class that wraps up the process of taking 
+# a markdown formatted document and using pandoc to output html,ebook
+# or Word doc
+
+# originally for my (Murray) story writing sideline, it can be nice for 
+# throwing together documentation too.
+# 
+# All we have to do is:
+# 1) instantiate a Book object
+# 2) fill in the basic properties of the Book
+# 3) write the "chapters" which are the individual markdown text files that make the bulk
+#    of the document and tell the Book about them.
+# 4) execute this file like any other Python source file.
+bk = meBook.Book()
+
+bk.style = "book.css"
+
+bk.title    = "mc_base"
+bk.author   = "Murray"
+bk.date     = [2022,10,17]
+bk.coverImg = "imgs/tst.jpg"
+#bk.outputTypes = ["html", "word", "epub"]
+bk.outputTypes = ["html"]
+
+bk.MakeChapter( 0, "Framework Overview", ["../README.md"] )
+bk.MakeChapter( 1, "BioCV", [ "chapters/biocv.md"] )
+bk.MakeChapter( 2, "Footcontact", ["chapters/fc.md"] )
+
+
+
+
+
+bk.Compile()
