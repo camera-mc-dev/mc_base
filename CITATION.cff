@@ -1,0 +1,30 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: mc-dev
+message: 'mc-dev: multi-camera, motion-capture.... dev...'
+type: software
+authors:
+  - given-names: Murray
+    family-names: Evans
+    email: m.evans@bath.ac.uk
+    affiliation: University of Bath
+  - given-names: Laurie
+    family-names: Needham
+    affiliation: University of Bath
+repository-code: 'https://github.com/camera-mc-dev'
+url: 'https://github.com/camera-mc-dev'
+abstract: >-
+  Collection of tools created in C++ for multi-camera and
+  markerless motion capture experiments from the CAMERA
+  centre and the University of Bath. Includes camera
+  calibration, multi-camera annotation, pipeline for
+  markerless motion capture (cross camera detection
+  association, tracking, 3D reconstruction), OpenSim
+  fitting, and other things.
+keywords:
+  - camera calibration
+  - multi camera
+  - markerless motion capture
+license: GPL-3.0
