@@ -1,5 +1,5 @@
 # base on an NVidia cuda, Ubuntu 20.04 system
-FROM nvidia/cuda:11.6.0-devel-ubuntu20.04
+FROM nvidia/cuda:11.8.0-devel-ubuntu20.04
 
 # -----------------------------
 # system installs
@@ -10,7 +10,7 @@ RUN apt-get -y install build-essential
 RUN ln -s /usr/share/zoneinfo/Europe/London /etc/localtime
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata
 RUN apt-get -y install git
-RUN apt-get -y install cuda-toolkit-11-6
+RUN apt-get -y install cuda-toolkit-11-8
 RUN apt-get -y install libcudnn8-dev
 RUN apt-get -y install wget
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install intel-mkl-full
@@ -24,7 +24,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install intel-mkl-full
 # -----------------------------
 
 # clone
-RUN git clone camera@rivendell.cs.bath.ac.uk:mc_base mc_dev
+#RUN git clone camera@rivendell.cs.bath.ac.uk:mc_base mc_dev
+RUN git clone git@github.com:camera-mc-dev/mc_base mc_dev
 RUN apt install scons
 RUN apt install pandoc
 WORKDIR /
@@ -36,7 +37,8 @@ RUN mkdir deps
 
 # clone
 WORKDIR mc_dev
-RUN git clone camera@rivendell.cs.bath.ac.uk:mc_core
+#RUN git clone camera@rivendell.cs.bath.ac.uk:mc_core
+RUN git clone git@github.com:camera-mc-dev/mc_core
 
 
 # dependencies
@@ -96,67 +98,25 @@ RUN scons mc_core/build/optimised/bin -j6
 
 
 # ----------------------------
-# mc_bgs
+# mc_torched
 # ----------------------------
 
-WORKDIR mc_dev
-RUN scons mc_bgs/build/optimised/bin -j6
-
-# ----------------------------
-# mc_sds
-# ----------------------------
-
-WORKDIR mc_dev
-RUN scons mc_sds/build/optimised/bin -j6
-
-# ----------------------------
-# mc_imgproc
-# ----------------------------
-
-RUN apt install libfftw3-dev
-WORKDIR mc_dev
-RUN scons mc_bgs/build/optimised/bin -j6
-
-# ----------------------------
-# mc_reconstruction
-# ----------------------------
-
-WORKDIR /
-RUN git clone https://github.com/pyomeca/ezc3d.git
-WORKDIR /deps/ezc3d
-RUN mkdir build
-WORKDIR /deps/ezc3d/build
-RUN cmake ../
-RUN make -j6
-RUN make install
-
-WORKDIR mc_dev
-RUN scons mc_reconstruction/build/optimised/bin -j6
+# get lib-torch
+#WORKDIR /deps
+#RUN wget https://download.pytorch.org/libtorch/cu118/libtorch-cxx11-abi-shared-with-deps-2.1.0%2Bcu118.zip
+RUN wget 'https://download.pytorch.org/libtorch/cu118/libtorch-shared-with-deps-2.1.0+Bcu118.zip'
 
 
-# ----------------------------
-# mc_nets
-# ----------------------------
 
-# Update CMake
-RUN apt-get -y install software-properties-common lsb-release
-RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
-RUN apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
-RUN apt update
-RUN apt install kitware-archive-keyring
-RUN rm /etc/apt/trusted.gpg.d/kitware.gpg
-RUN apt-get update
-RUN apt-get -y install cmake=3.19.5-0kitware1ubuntu20.04.1 cmake-data=3.19.5-0kitware1ubuntu20.04.1
+# get mc_torched
+WORKDIR /mc_dev
+#RUN git clone camera@rivendell.cs.bath.ac.uk:mc_core
+RUN git clone git@github.com:camera-mc-dev/mc_torched
 
-# we need mxnet
-WORKDIR /deps
-RUN wget https://dlcdn.apache.org/incubator/mxnet/1.9.1/apache-mxnet-src-1.9.1-incubating.tar.gz -O mxnet-1.9.1.tar.gz
-RUN tar -xzf mxnet-1.9.1
-WORKDIR /deps/mxnet-1.9.1
-RUN mkdir build
-WORKDIR /deps/mxnet-1.9.1/build
-RUN apt install ninja-build ccache
-RUN cmake -DCMAKE_CUDA_COMPILER=/usr/local/cuda-11.6/bin/nvcc -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-11.6 -DMKL_INCLUDE_DIR=/usr/include/mkl/ ../
-RUN make -j6
+# adjust dependency paths of mc_torched
+RUN sed -i 's|/data2/software|/deps|g' mc_torched/mcdev_torched_config.py
+
+# build
+RUN scons mc_torched/build/optimised/bin -j8
 
 
