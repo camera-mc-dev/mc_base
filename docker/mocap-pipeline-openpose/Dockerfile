@@ -178,7 +178,6 @@ RUN ldconfig
 # now we can build mc_dev
 WORKDIR /mc_dev
 RUN sed -i s@/opt/opensim@/deps/opensim@g mc_reconstruction/mcdev_recon_config.py 
-RUN sed -i 's@"/deps/opensim/install/sdk/include/OpenSim/",@&\n                        "/deps/opensim/install/sdk/spdlog/include/",@' mc_reconstruction/mcdev_recon_config.py
 RUN scons -j6 install=true
 
 
