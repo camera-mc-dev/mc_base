@@ -1,30 +1,32 @@
 ## `mc_dev`
 
-The `mc_dev` framework is a suite of C++ tools created for enabling development of multi-camera markerless motion capture tools, but is likely to be useful to all CAMERA researchers using C++ and multiple cameras. Depending how you feel, you can think of the `mc_` as standing for multi-camera, motion capture or markerless capture.
+The `mc_dev` framework is a suite of tools created for various experiments in multi-camera computer vision, but especially markerless motion capture. Depending how you feel, you can think of the `mc_` as standing for **M**ulti-**C**amera, **M**otion **C**apture or **M**arkerless **C**apture.
 
-A brief summary of some of the key features are:
+The full framework is a general mush of related experiments never meant to be seen in public - however, some key parts have been tidied up to support publications, especially the BioCV dataset.
 
-  * Camera calibration: full suite of tools for detection of calibration boards, annotating cross-camera matches, intrinsic calibration and calibration of a network of overlapping cameras, including Ceres based bundle adjustment.
-  * Simplistic OpenGL renderer: define models, scene graph, shaders, and camera (camera compatible with calibrations!), and avoid all the low-level OpenGL without needing a full graphics engine.
-  * Background subtraction: 
-  * Occupancy maps for multi-camera detection, tracking, and cross-camera object associations.
-  * Fitting body models (SMPL, STAR, Dynadog) to data (point clouds, mocap, sparse 3D pose, DensePose) - Older stuff using Ceres, newer stuff using MXNet
-  * sprint and skeleton projects
-
-The full framework has been split into a number of repositories so that parts can be more easily shared:
+The main repositories are thus:
 
   - `mc_base`: a top level directory in which to put the other parts of the project
   - `mc_core`: core framework library and tools, including calibration, image io and renderer.
-  - `mc_bgs`: tools and libs for background subtraction. Includes a clone of 3rd party IMBS bgs algorithm.
-  - `mc_sds`: implementation of *Stochastic Diffusion Search* - well, more or less. A kind of evolutionary algorithm for non-linear minimisation. Not the fastest solver in the world, but easy to use and quite robust.
-  - `mc_imgproc`: image processing tools like debayering and ASEF/MSER filters
-  - `mc_grabber`: Tools as deployed on *Boromir* for grabbing images/video from the JAI cameras using the SISO grabbers.
   - `mc_reconstruction`: Occupancy maps, and sparse-pose-fusion (e.g. take 2D pose detections from OpenPose or AlphaPose and do cross-camera association and 3D reconstruction)
-  - `mc_fitting`: Implementations of models like SMPL, STAR, DynaDog and solvers to fit the models to point clouds, motion capture markers, sparse pose, and dense pose
-  - `mc_footContact`: Tools for the foot contact project for sprinting and skeleton.
-  - `mc_skeleton`: Tools and experiments for tracking skeleton athletes
+  - `mc_opensim`: A set of Python scripts to take the output of `mc_reconstruction` and pass through OpenSim solvers.  
+  - `mc_sds`: implementation of *Stochastic Diffusion Search* - well, more or less. A kind of evolutionary algorithm for non-linear minimisation. Not the fastest solver in the world, but easy to use and quite robust.
+  - `mc_grabber`: Tool used for recording images from our machine vision system based on JAI cameras and SISO coaxpress grabbers. This could be of use to others are it _should_ be extendable to other machine vision systems, but I'm not going to try and claim it is anywhere near "consumer grade" software - having said that, I've used far worse "professional" pieces of software...
+   - `mc_imgproc`: image processing tools like debayering and ASEF/MSER filters
+
+
+Dig enough on the CAMERA gitolite server and you'll find other repositories too:
+
+  - `mc_bgs`: tools and libs for background subtraction. Includes a clone of 3rd party IMBS bgs algorithm.
+ - `mc_fitting`: Implementations of models like SMPL, STAR, DynaDog and solvers to fit the models to point clouds, motion capture markers, sparse pose, and dense pose
+  - `mc_footContact`: Software that relates to our foot-contact papers
+  - `mc_skeleton`: Experiments for tracking skeleton athletes.
   - `mc_experiments`: A place for miscellaneous tools and experiments before they get their own repo or get integrated into other repos
-  - 
+  - `mc_torched`: LibTorch related experiments, particularly for NeRF
+  - `mc_nets`: MXNet related experiments, calibration board detection, pose detectors, etc...
+
+Especially for the latter repositories, the focus of work shifts around and so expect a fair degree of bit-rot and a lot of experiments have been rapid bodges with no intent to share that were in many ways learning experiments, especially `mc_nets`. 
+
 
 ## `mc_base`
 
@@ -32,13 +34,13 @@ The `mc_base` repo provides a convenient base in which to place all other reposi
 
 Many of the reposotories will look for other `mc_` family repos in the same root they themselves are in, and `mc_base` makes for a good place to put that root.
 
-Hence, the recommended way of using the whole framework is to first pull `mc_base`, them `mc_core` and any other repos you need.
+Hence, the recommended way of using the whole framework is to first pull `mc_base`, then `mc_core` and any other repos you need.
 
 ```bash
    cd /where/you/keep/code-projects
-   git clone camera@rivendell.cs.bath.ac.uk:mc_base mc_dev
+   git clone git@github.com:camera-mc-dev/mc_base mc_dev
    cd mc_dev
-   git clone camera@rivendell.cs.bath.ac.uk:mc_core mc_core
+   git clone git@github.com:camera-mc-dev/mc_core mc_core
 ```
 
 There are a couple of convenience scripts within `mc_base`:
@@ -56,6 +58,15 @@ You can issue a `git status` on all the `mc_` family repos that you current have
 ```
 
 More complete build instructions are discussed in each repository, but overall, the `scons` tool is used for building all repositories, and each repository has a `mcdev_<name>_config.py` for setting build options and library paths. `scons` is mostly just Python so it should be simple enough to get a grip of.
+
+### Specific use cases
+
+`mc_dev` is a agglomeration of things used for various experiments, but there are core uses. Specific, public instructions pertinent to those core uses can be found on github:
+
+  1) markerless motion capture pipeline (BioCV dataset): [Instructions here](https://github.com/camera-mc-dev/.github/blob/main/profile/mocapPipe.md)
+
+You will find Dockerfiles or scripts for helping to automate the build process for those specific use cases within the `mc_base` repository under either the `docker` or `buildHelpers` directories. Refer to the instructions for each use case linked above for more details of each.
+
 
 ### Building
 
@@ -78,13 +89,17 @@ Individual targets within repos can be built as well, such as:
 or
 
 ```bash
-   scons mc_bgs/build/debug -j6
+   scons mc_reconstruction/build/optimised/ -j6
 ```
 
 ### Install
 
 There is also an install command which will install all repository programmes under `/opt/mc_bin/` so you can have `/opt/mc_bin/mc_core/x` for all the `mc_core` tools.
 
+You can change the target directory for the installation from `/opt/mc_bin` to another location using the `installDir` option. For example...
 
 
+```bash
+   scons -j6 install=True installDir=~/bin/mc_bin
+```
 
